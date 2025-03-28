@@ -38,50 +38,38 @@ void selection_sort(vector<int>& input){
     }
 }
 
+vector<int> biggest_divisible_conglomerate(vector<int> input){
+    //Sorts the input so that the code can work
+    selection_sort(input);
+    
+    //Creates a vector of vectors to keep track of the possible conglomerates
+    vector<vector<int> > answers(input.size());
 
-//Helper function to find the biggest list
-vector<int> biggest_divisible_conglomerate_finder(vector<int> input){
-    vector<vector<int> > bdc(input.size()+1);
-    //Base case where the input size is less than or equal to 1
-    bdc.at(bdc.size()-1) = {};
+    //Itemizes the input into their own vectors so they can build the conglomerates starting that value
+    for(size_t i = 0; i<answers.size(); i++){
+        answers.at(i) = {input.at(i)};
+    }
 
-    vector<vector<int> > candidates;
-    for(int i = bdc.size()-2; i>=0; i--){
-        for(int n = i; n<input.size(); n++){
-            vector<int> left = {input.at(n)};
-
-            //Finds the position of the next number divisible the current element we are checking at i
-            int j = n+1;
-            while(j<input.size() && input.at(j)%input.at(n)!=0){
-                j++;
-            }
-            vector<int> right = bdc.at(j);
-
-            vector<int> cand(left);
-            for(int k = 0; k<right.size(); k++){
-                if(right.at(k)%cand.at(0)==0){
-                    cand.push_back(right.at(k));
+    //For each value in the input it creates a conglomerate, and adds the previously calculated conglomerate
+    //If the value we are checking is divisible by a previously calculated conglomerate
+    //Because the list is sorted, anything that is divisible by that element is divisible by the others too 
+    for(size_t i = 0; i<input.size(); i++){
+        for(size_t j = i+1; j<input.size(); j++){
+            if(input.at(j)%input.at(i)==0 && answers.at(i).size()>=answers.at(j).size()){
+                answers.at(j) = {input.at(j)};
+                for(size_t k = 0; k<answers.at(i).size(); k++){
+                    answers.at(j).push_back(answers.at(i).at(k));
                 }
             }
-            candidates.push_back(cand);
         }
-
-        unsigned int maxSizeIndex = 0;
-        for(unsigned int l = 1; l<candidates.size(); l++){
-            if(candidates.at(l).size() > candidates.at(maxSizeIndex).size()){
-                maxSizeIndex = l;
-            }
-        }
-
-        bdc.at(i) = candidates.at(maxSizeIndex);
     }
-    
-    return bdc.at(0);
-}
 
-vector<int> biggest_divisible_conglomerate(vector<int> input){
-    //Sorts the input because it makes finding the bdc much easier
-    selection_sort(input);
-    //Finds the bdc
-    return biggest_divisible_conglomerate_finder(input);
+    //Finds the index of the biggest divisible conglomerate and returns that conglomerate
+    size_t maxidx = 0;
+    for(size_t i = 1; i<answers.size(); i++){
+        if(answers.at(i).size()>answers.at(maxidx).size()){
+            maxidx = i;
+        }
+    }
+    return answers.at(maxidx);
 }
