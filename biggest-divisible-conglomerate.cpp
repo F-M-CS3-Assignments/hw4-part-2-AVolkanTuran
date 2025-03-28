@@ -25,9 +25,9 @@ void selection_sort(vector<int>& input){
     if(input.size()==0){
         return;
     }
-    for(int i = 0; i<input.size()-1; i++){
+    for(size_t i = 0; i<input.size()-1; i++){
         int minIndex = i;
-        for(int j = i+1; j<input.size(); j++){
+        for(size_t j = i+1; j<input.size(); j++){
             if(input.at(j)<input.at(minIndex)){
                 minIndex = j;
             }
@@ -39,8 +39,23 @@ void selection_sort(vector<int>& input){
 }
 
 vector<int> biggest_divisible_conglomerate(vector<int> input){
+    //Base case immediately returns the input if size is 1 or 0
+    if(input.size()<=1){
+        return input;
+    }
+
     //Sorts the input so that the code can work
     selection_sort(input);
+    
+    //Removes all the 0's as they aren't divisible by anything and will cause an error
+    size_t k = 0;
+    while(input.at(k)==0){
+        k++;
+    }
+    if(k>0){
+        vector<int> noZeroInput(input.begin()+k, input.end());
+        input = noZeroInput;
+    }
     
     //Creates a vector of vectors to keep track of the possible conglomerates
     vector<vector<int> > answers(input.size());
